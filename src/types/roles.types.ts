@@ -27,5 +27,5 @@ export interface IDeleteRol{
     OnGetRoleList : () => void
     OnCreateRol : (payload : ICreateRol) => void
     OnUpdateRol : ( rolId: number, payload : IUpdateRol) => void
-    OnDeleteRol : (payload : IDeleteRol) => void 
+    OnDeleteRol : (id : number) => void 
   }

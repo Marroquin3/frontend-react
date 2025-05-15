@@ -5,20 +5,22 @@ import CreateRol from './CreacteRol';
 import UpdateRol from './UpdateRol';
 import { useRolStore } from '../../store/role.store';
 import type { Role } from '../../types/roles.types';
+import DeleteRol from './DeleteRol';
 
 function RoleList() {
     const { roles, OnGetRoleList, OnCreateRol, OnUpdateRol } = useRolStore();
-     const [dataUpdateRol , setDtaUpdateRol] = useState<Role>()
-    const [roleToDelete, setRoleToDelete] = useState<{ id: number; roleName: string } | null>(null);
+    const [dataUpdateRol , setDtaUpdateRol] = useState<Role>()
+    const [roleToDelete, setRoleToDelete] = useState<{ id: number; name: string; isActive: boolean } | null>(null);
     const [name, setName] = useState("");
+    const [isOPenModalDelete, setIsOpenModalDelete] = useState(false)
 
     useEffect(() => {
         OnGetRoleList();
     }, []);
 
-    const handleDelete = (id: number, roleName: string) => {
-        setRoleToDelete({ id, roleName });
-    };
+        // const handleDelete = (id: number, roleName: string) => {
+        //     setRoleToDelete({ id, roleName });
+        // };
 
     const confirmDelete = () => {
         if (roleToDelete) {
@@ -90,13 +92,17 @@ function RoleList() {
                                 <td className="py-2 px-4 text-center">{rol.name}</td>
                                 <td className="py-2 px-4 text-center">
                                     <button
-                                        onClick={() => setDtaUpdateRol(rol)}
+                                    
+                                        onClick={() =>  setDtaUpdateRol(rol)}
                                         className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-1 px-3 rounded-full mr-2"
                                     >
                                         Editar
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(rol.id, rol.name)}
+                                        onClick={() => {
+                                            setRoleToDelete(rol)
+                                            setIsOpenModalDelete(true)
+                                        }}
                                         className="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-full"
                                     >
                                         Eliminar
@@ -113,25 +119,11 @@ function RoleList() {
 
             {/* Modal de confirmación de eliminación */}
             {roleToDelete && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                        <p className="mb-4">¿Estás seguro de que deseas eliminar el rol <strong>"{roleToDelete.roleName}"</strong>?</p>
-                        <div className="flex justify-center">
-                            <button
-                                onClick={confirmDelete}
-                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
-                            >
-                                Sí, eliminar
-                            </button>
-                            <button
-                                onClick={cancelDelete}
-                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full ml-4"
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                </div>
+               <DeleteRol
+                isOpen={isOPenModalDelete}
+                onClose={() => setIsOpenModalDelete(false)}
+                roleToDelete={roleToDelete}
+               />
             )}
 
             {/* Modal de edición */}

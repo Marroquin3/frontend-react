@@ -13,7 +13,7 @@ interface UpdateRolProps {
 const UpdateRol: React.FC<UpdateRolProps> = ({ isOpen, onClose, onUpdate }) => {
   const [dataRol , setDataRol] = useState<Role>({
      id : 0 ,
-     name : "",
+     name : "",   
      isActive : true
   })
  const {  OnUpdateRol } = useRolStore();

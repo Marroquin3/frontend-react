@@ -6,30 +6,28 @@ export const useRolStore = create<IRoleStore>((set , get)=> ({
     roles : [],
     OnGetRoleList(){
         try {
-             get_rol_list().then((res) => {
-               
+            get_rol_list().then((res) => {
                     set ({ roles : res.data.roles})
-                 
-             })
+            })
         } catch (error) {
-             set({ roles : []})
+            set({ roles : []})
         }
     },
     OnCreateRol(payload : ICreateRol){
-          try {
+        try {
                     create_rol(payload).then((res)=> {
                         if(res.data.ok){
-                             get().OnGetRoleList()
+                            get().OnGetRoleList()
                         }
                     })
-          } catch (error) {
-              console.log("OCURRIO UN ERROR AL CREAR EL ROL ")
-          }
+        } catch (error) {
+            console.log("OCURRIO UN ERROR AL CREAR EL ROL ")
+        }
     },
 
     OnUpdateRol(rolId, payload : IUpdateRol){
         try {
-             update_rol(rolId, payload).then((res) =>{
+            update_rol(rolId, payload).then((res) =>{
                 if (res.data.ok){
                     get().OnGetRoleList();
                 }
@@ -39,26 +37,16 @@ export const useRolStore = create<IRoleStore>((set , get)=> ({
         }
     },
 
-OnDeleteRol(payload: IDeleteRol) {
+OnDeleteRol(id) {
     try {
-        // Llamar a delete_rol con solo el id
-        delete_rol(payload.id).then((res) => {
+        delete_rol(id).then((res) => {
             if (res.ok) {
-                get().OnGetRoleList(); // Actualizar la lista de roles después de la eliminación
-
-                // Mostrar un mensaje de éxito
-                toast.success("El rol ha sido eliminado correctamente.", {
-                    position: 'top-right',
-                    autoClose: 3000,
-                });
+                get().OnGetRoleList();
             }
         });
     } catch (error) {
-        console.log("OCURRIÓ UN ERROR AL ELIMINAR EL ROL");
-        toast.error("Hubo un error al intentar eliminar el rol.", {
-            position: 'top-right',
-            autoClose: 3000,
-        });
+        console.log("El rol ha sido eliminado correctamente.", {
+                });
     }
 }
 

@@ -1,62 +1,56 @@
-// import React, { useState } from 'react';
-// import { toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-// import { useRolStore } from '../../store/role.store';
+import React from 'react';
+import { useRolStore } from '../../store/role.store';
+import { toast } from 'react-toastify';
+import type { Role } from '../../types/roles.types';
 
-// interface DeleteRolProps {
-//   roleToDelete: { id: number; roleName: string } | null;
-//   onClose: () => void;
-// }
+interface DeleteRolProps {
+  isOpen: boolean;
+  onClose: () => void;
+  roleToDelete: Role;
+}
 
-// const DeleteRol: React.FC<DeleteRolProps> = ({ roleToDelete, onClose }) => {
-//   const { OnDeleteRol } = useRolStore();
-  
-//   const confirmDelete = async () => {
-//     if (roleToDelete) {
-//       try {
-//         await OnDeleteRol(roleToDelete.id);  // Llamada para eliminar el rol
-//         toast.success(`Rol "${roleToDelete.roleName}" eliminado correctamente`, {
-//           position: 'top-right',
-//           autoClose: 3000,
-//         });
-//         onClose();  // Cerrar el modal después de la eliminación
-//       } catch (error) {
-//         toast.error('Hubo un error al eliminar el rol');
-//       }
-//     }
-//   };
+const DeleteRol: React.FC<DeleteRolProps> = ({ isOpen, onClose, roleToDelete }) => {
+  const { OnDeleteRol, OnGetRoleList } = useRolStore();
 
-//   const cancelDelete = () => {
-//     onClose();  // Simplemente cerrar el modal si no se confirma la eliminación
-//   };
+  const handleDelete = async () => {
+    try {
+      await OnDeleteRol(roleToDelete.id);
+      toast.success(`Rol "${roleToDelete.name}" eliminado correctamente`, {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+      OnGetRoleList(); // Recargar lista de roles
+      onClose(); // Cerrar modal
+    } catch (error) {
+      toast.error('Hubo un error al eliminar el rol');
+    }
+  };
 
-//   if (!roleToDelete) {
-//     return null;
-//   }
+  if (!isOpen) return null;
 
-//   return (
-//     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-//       <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-//         <p className="mb-4">
-//           ¿Estás seguro de que deseas eliminar el rol <strong>"{roleToDelete.roleName}"</strong>?
-//         </p>
-//         <div className="flex justify-center">
-//           <button
-//             onClick={confirmDelete}
-//             className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
-//           >
-//             Sí, eliminar
-//           </button>
-//           <button
-//             onClick={cancelDelete}
-//             className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full ml-4"
-//           >
-//             Cancelar
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-md">
+        <p className="mb-4 text-gray-800">
+          ¿Estás seguro de que deseas eliminar el rol <strong>"{roleToDelete.name}"</strong>?
+        </p>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={onClose}
+            className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full mr-2"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleDelete}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
+          >
+            Sí, eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-// export default DeleteRol;
+export default DeleteRol;
