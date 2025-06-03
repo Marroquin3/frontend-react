@@ -18,25 +18,7 @@ function RoleList() {
         OnGetRoleList();
     }, []);
 
-        // const handleDelete = (id: number, roleName: string) => {
-        //     setRoleToDelete({ id, roleName });
-        // };
-
-    const confirmDelete = () => {
-        if (roleToDelete) {
-            // Aquí iría la lógica de eliminación real.
-            toast.success(`Se ha eliminado el rol correctamente`, {
-                position: 'top-right',
-                autoClose: 3000,
-            });
-            setRoleToDelete(null);
-        }
-    };
-
-    const cancelDelete = () => {
-        setRoleToDelete(null);
-    };
-
+        
     
     const handleCreateRol = async () => {
         if (!name.trim()) {

@@ -1,73 +1,53 @@
-// import React, { useState, useEffect } from 'react';
-// import {
-//     get_all_users,
-//     create_user,
-//     delete_user,
-//     update_user,
+import { create } from 'zustand'
+import type { ICreateUser, IUpdateUser, IUserStore } from '../types/user.types'
+import { create_user, delete_user, get_user_list, update_user } from '../services/users.service'
 
-// } from '../services/users.service';
-// import { CreateUser, GetUser, UpdateUser } from '../types/user.types';
+export const useUserStore = create<IUserStore>((set, get) => ({
+    user: [],
+    OnGetUserList() {
+    try {
+        get_user_list().then((res) => {
+        set({ user: res.data.users })
+        })
+    } catch (error) {
+        set({ user: [] })
+    }
+    },
 
-// const UseUserStore = () => {
+        OnCreateUser(payload : ICreateUser){
+            try {
+                        create_user(payload).then((res)=> {
+                            if(res.data.ok){
+                                get().OnGetUserList()
+                            }
+                        })
+            } catch (error) {
+                console.log("OCURRIO UN ERROR AL CREAR EL USUARIO ")
+            }
+        },
 
-//     const [users, setUser] = useState<GetUser[]>([]);
+        OnUpdateUser(rolId, payload : IUpdateUser){
+                try {
+                    update_user(rolId, payload).then((res) =>{
+                        if (res.data.ok){
+                            get().OnGetUserList();
+                        }
+                    });
+                } catch (error) {
+                    console.log("OCURRIÓ UN ERROR AL ACTUALIZAR EL USUARIO");
+                }
+            },
 
-//     useEffect(() => {
-//         GetAllUser();
-//     }, []);
-//     const GetAllUser = async () => {
-//         try {
-//             const data = await get_all_users();
-//             setUser(data.users);
-//         } catch {
-
-//         }
-//     };
-//     const CreateUser = async (user: CreateUser) => {
-//         try {
-//             const data = await create_user(user);
-
-//             if (data.ok) {
-
-//                 await GetAllUser();
-//             } else {
-
-//             }
-//         } catch (error) {
-
-//         }
-//     };
-//     const DeleteUser = async (id: number) => {
-//         try {
-//             const data = await delete_user(id);
-
-//             if (data.ok) {
-//                   await GetAllUser();
-//             }
-//         } catch {
-
-//         }
-//     };
-//     const UpdateUser = async (id: number, user: UpdateUser) => {
-//         try {
-//             const data = await update_user(id, user);
-
-//             if (data.ok) {
-
-//                 await GetAllUser();
-//             } else {
-//             }
-//         } catch (error) {
-
-//         }
-//     };
-//     return {
-//         users,
-//         GetAllUser,
-//         CreateUser,
-//         DeleteUser,
-//         UpdateUser,
-//     };
-// };
-
-// export default UseUserStore;
+            OnDeleteUser(id) {
+                try {
+                    delete_user(id).then((res) => {
+                        if (res.ok) {
+                            get().OnGetUserList();
+                        }
+                    });
+                } catch (error) {
+                    console.log("El rol ha sido eliminado correctamente.", {
+                            });
+                }
+            }
+}))

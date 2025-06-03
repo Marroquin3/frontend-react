@@ -18,3 +18,25 @@ export interface Role {
   name: string
   isActive: boolean
 }
+
+export interface ICreateUser{
+  userName : string
+  password : string
+  roleId: number
+  role : Role
+}
+
+export interface IUpdateUser{
+  userName : string
+  password : string
+  roleId: number
+  role : Role
+}
+
+export interface IUserStore{
+  user : User[],
+  OnGetUserList : ()=> void
+  OnCreateUser : (payload : ICreateUser) => void
+  OnUpdateUser : ( userId: number, payload : IUpdateUser) => void
+  OnDeleteUser : (id : number) => void
+}

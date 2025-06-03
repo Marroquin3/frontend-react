@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Rol from './view/Rol';
+import Rol from './pages/Rol';
+import User from './pages/User';
 
 const AppRoutes: React.FC = () => {
     return (
@@ -9,7 +10,7 @@ const AppRoutes: React.FC = () => {
             <Routes>
                 {/* <Route path="/" element={<Login />} /> */}
                 <Route path="/roles" element={<Rol />} />
-                {/* <Route path="/users" element={<Users />} /> */}
+                <Route path="/users" element={<User />} />
             </Routes>
         </Router>
     );

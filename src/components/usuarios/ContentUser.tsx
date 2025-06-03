@@ -1,115 +1,109 @@
-import { useState, useEffect } from "react";
-import UseUserStore from "../../stores/user.store";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import CreateUserModal from "../../components/User/CreateUser";
-import UpdateUser from "./UpdateUser";
-
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useUserStore } from "../../store/user.store";
+import type { ICreateUser, Role } from "../../types/user.types";
+import axios from "axios";
 
 function UserList() {
-    const { users, GetAllUser, DeleteUser } = UseUserStore();
-    const [userToDelete, setUserToDelete] = useState<{ id: number; userEmail: string } | null>(null);
+  const { user, OnGetUserList, OnCreateUser, OnUpdateUser } = useUserStore();
 
-    useEffect(() => {
-        GetAllUser();
-    }, []);
-    const handleDelete = (id: number, userEmail: string) => {
-        setUserToDelete({ id, userEmail });
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [roleId, setRoleId] = useState<number | "">("");
+  const [role, setRole] = useState<Role | null>(null);
+
+  useEffect(() => {
+    OnGetUserList();
+  }, []);
+
+  const handleApiUpdate = async () => {
+    try {
+      const res = await axios.post("http://localhost:3000/api/update"); // Usa tu URL real de backend
+      toast.success(res.data.message || "API actualizada correctamente.");
+    } catch (error) {
+      toast.error("Error al actualizar la API.");
+      console.error(error);
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (!userName.trim()) {
+      toast.error("Por favor ingresa un nombre para el usuario.");
+      return;
+    }
+
+    const newUser: ICreateUser = {
+      userName,
+      password,
+      roleId: Number(roleId),
+      role: role as Role
     };
-    const confirmDelete = () => {
-        if (userToDelete) {
-            
-            DeleteUser(userToDelete.id);
-            toast.success(`Se ha eliminado el usuario  correctamente`, {
-                position: 'top-right',
-                autoClose: 3000,
-            });
-          
-            setUserToDelete(null);
-        }
-    };
-    const cancelDelete = () => {
-        setUserToDelete(null);
-    };
 
-    return (
+    try {
+      await OnCreateUser(newUser);
+      toast.success("Usuario creado correctamente.");
+      setUserName("");
+      setPassword("");
+      setRoleId("");
+      setRole(null);
+    } catch (error) {
+      toast.error("Error al crear el usuario.");
+      console.error(error);
+    }
+  };
 
-        <div className="container mx-auto mt-8">
-            <h1 className="text-2xl font-semibold text-center mb-4">Lista de Usuarios</h1>
-          
-            <div className="flex justify-end mb-4">
-                <CreateUserModal />
-            </div>
-         
-            <div className="flex justify-center">
-  <table className="min-w-full">
-    <thead>
-      <tr className="bg-gray-800 text-white">
-        <th className="py-2 px-4">email</th>
-        <th className="py-2 px-4">rol</th>
-        <th className="py-2 px-4">Acciones</th>
-      </tr>
-    </thead>
-    <tbody className="bg-white divide-y divide-gray-200">
-      {users.map((user) => (
-        <tr key={user.id}>
-          <td className="py-2 px-4 whitespace-nowrap text-center">{user.email}</td>
-          <td className="py-2 px-4 whitespace-nowrap text-center">{user.rol.rol}</td>
-          <td className="py-2 px-4 whitespace-nowrap text-center">
-            <div className="flex items-center justify-center space-x-2">
-              <button
-                onClick={() => handleDelete(user.id, user.email)}
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full flex items-center"
-              >
-                <svg
-                  width="27"
-                  height="27"
-                  fill="none"
-                  stroke="#0d0c0c"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M3 6h18"></path>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                Eliminar
-              </button>
-              <UpdateUser id={user.id} newEmailUser={user.email} newRolId={user.rolId} />
-            </div>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold mb-4">Crear Nuevo Usuario</h2>
 
-            <ToastContainer />
-            {userToDelete && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <p>¿Estás seguro de que deseas eliminar el rol "{userToDelete.userEmail}"?</p>
-                        <div className="mt-4 flex justify-center">
-                            <button
-                                onClick={confirmDelete}
-                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full"
-                            >
-                                Sí, eliminar
-                            </button>
-                            <button
-                                onClick={cancelDelete}
-                                className="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full ml-4"
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    )
+      <input
+        type="text"
+        placeholder="Nombre de usuario"
+        value={userName}
+        onChange={(e) => setUserName(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3"
+      />
+
+      <input
+        type="password"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3"
+      />
+
+      <input
+        type="number"
+        placeholder="ID del Rol"
+        value={roleId}
+        onChange={(e) => setRoleId(Number(e.target.value))}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-3"
+      />
+
+      {/* Si deseas ingresar manualmente el nombre del rol */}
+      <input
+        type="text"
+        placeholder="Nombre del Rol"
+        value={role?.name || ""}
+        onChange={(e) => setRole({ id: Number(roleId) || 0, name: e.target.value, isActive: true })}
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4"
+      />
+
+      <button
+        onClick={handleCreateUser}
+        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        Guardar Usuario
+      </button>
+
+      <button
+        onClick={handleApiUpdate}
+        className="w-full bg-green-600 text-white py-2 rounded-lg mt-4 hover:bg-green-700 transition"
+      >
+        Actualizar API
+      </button>
+    </div>
+  );
 }
 
 export default UserList;

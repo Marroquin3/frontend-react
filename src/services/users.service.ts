@@ -1,35 +1,31 @@
-// src/services/users.service.ts
+import axios from 'axios'
+import { API_URL } from '../utils/constants'
+import type { ICreateUser, IResponseUser } from '../types/user.types';
 
-import axios from "axios";
-import { API_URL } from "../utils/constants";
-import type { IResponseUser } from "../types/user.types";
 
-export const get_all_roles = () => {
-  return axios.get<IResponseUser>(API_URL + "/users/filtrar");
-};
+export const create_user = async (payload : ICreateUser) => {
+        return axios.post<{ok : boolean}> (API_URL + "/users" , payload)
+    };
 
-export const get_users =(
+    export const get_user_list = async () => {
+    return axios.get<IResponseUser>(API_URL + "/users")
+    };
+
+    export const get_user_id = async (id: number) => {
+    const { data } = await axios.get<{ roles: IResponseUser[] }>(
+    API_URL + "/users" + id,
     
-) =>{
-    return axios.get<IResponseUser>(API_URL + "users")
-}
-export function get_user_paginated(page: number, limit: number, userName: string, role: string, active: number): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Function not implemented.');
-}
+    );
+    return data;
+    };
 
-export function get_users_list(): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Function not implemented.');
-}
+    export const update_user = async (id: number, payload: Partial<ICreateUser>) => {
+    return axios.patch<{ok : boolean}> (`${API_URL}/users/${id}`, payload);
+    }
 
-export function save_user(payload: Partial<IResponseUser>): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Function not implemented.');
-}
-
-export function patch_user(payload: Partial<IResponseUser>, id: number): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Function not implemented.');
-}
-
-export function delete_user(id: number): { data: any; } | PromiseLike<{ data: any; }> {
-    throw new Error('Function not implemented.');
-}
-
+    export const delete_user = async (id: number) => {
+    const { data } = await axios.delete<{ ok:boolean , msg:string }>(
+        API_URL + "/users/" + id,
+    );
+    return data;
+    };
